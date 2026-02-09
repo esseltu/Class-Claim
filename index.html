@@ -10,8 +10,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ClassClaim">
     <title>ClassClaim</title>
-    <script type="module" crossorigin src="/Class-Claim/assets/index-DBS_8Hmb.js"></script>
-    <link rel="stylesheet" crossorigin href="/Class-Claim/assets/index-Ce5bk3_r.css">
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        // Ignore resize observer errors
+        if (message.includes('ResizeObserver')) return;
+        alert('Error: ' + message + '\nLine: ' + lineno);
+      };
+      window.onunhandledrejection = function(event) {
+        alert('Promise Error: ' + event.reason);
+      };
+    </script>
+    <script type="module" crossorigin src="/Class-Claim/assets/index-C9c8BCRe.js"></script>
+    <link rel="stylesheet" crossorigin href="/Class-Claim/assets/index-CU-u3rAa.css">
   <link rel="manifest" href="/Class-Claim/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Class-Claim/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
