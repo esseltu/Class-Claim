@@ -2,24 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="logo.png" />
-    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#dc2626" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ClassClaim">
+    <meta name="theme-color" content="#ffffff" />
     <title>ClassClaim</title>
-    <script>
-      window.onerror = function(message, source, lineno, colno, error) {
-        // Ignore resize observer errors
-        if (message.includes('ResizeObserver')) return;
-        alert('Error: ' + message + '\nLine: ' + lineno);
-      };
-      window.onunhandledrejection = function(event) {
-        alert('Promise Error: ' + event.reason);
-      };
-    </script>
   </head>
   <body>
     <div id="root"></div>
