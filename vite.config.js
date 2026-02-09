@@ -18,6 +18,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
+        start_url: '/Class-Claim/',
+        scope: '/Class-Claim/',
         icons: [
           {
             src: 'logo.png',
