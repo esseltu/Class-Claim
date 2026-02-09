@@ -5,11 +5,10 @@ import {
   query, 
   where, 
   onSnapshot, 
-  addDoc, 
   deleteDoc, 
   doc,
   serverTimestamp,
-  getDocs
+  runTransaction
 } from 'firebase/firestore';
 import { format } from 'date-fns';
 
@@ -51,23 +50,23 @@ export const useBookings = (date, room) => {
   }, [date, room]);
 
   const addBooking = async (bookingDetails) => {
-    try {
-      // Double check for conflicts before adding (optional but recommended)
-      const q = query(
-        collection(db, "bookings"),
-        where("date", "==", bookingDetails.date),
-        where("room", "==", bookingDetails.room),
-        where("slot", "==", bookingDetails.slot)
-      );
-      
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        throw new Error("This slot has just been booked by someone else!");
-      }
+    // Create a deterministic ID to prevent duplicates
+    // Format: YYYY-MM-DD_Room_Slot (sanitize slot string)
+    const sanitizedSlot = bookingDetails.slot.replace(/[\/\s:]/g, '_');
+    const bookingId = `${bookingDetails.date}_${bookingDetails.room}_${sanitizedSlot}`;
+    const bookingRef = doc(db, "bookings", bookingId);
 
-      await addDoc(collection(db, "bookings"), {
-        ...bookingDetails,
-        createdAt: serverTimestamp()
+    try {
+      await runTransaction(db, async (transaction) => {
+        const sfDoc = await transaction.get(bookingRef);
+        if (sfDoc.exists()) {
+          throw new Error("This slot has just been booked by someone else!");
+        }
+
+        transaction.set(bookingRef, {
+          ...bookingDetails,
+          createdAt: serverTimestamp()
+        });
       });
       return true;
     } catch (err) {
