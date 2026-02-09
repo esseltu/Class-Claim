@@ -15,7 +15,7 @@ export default defineConfig({
         short_name: 'ClassClaim',
         description: 'Book lecture rooms at Central University Ghana',
         theme_color: '#dc2626',
-        background_color: '#ffffff',
+        background_color: '#dc2626',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/Class-Claim/',
