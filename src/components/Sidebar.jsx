@@ -29,7 +29,7 @@ const Sidebar = ({ selectedRoom, onSelectRoom, className = '' }) => {
     <div className={`flex flex-col h-full bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 transition-colors duration-200 ${className}`}>
       <div className="p-6">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent flex items-center gap-2">
-          <img src="/logo.png" alt="ClassClaim Logo" className="h-8 w-auto" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="ClassClaim Logo" className="h-8 w-auto" />
           ClassClaim
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Central University</p>
