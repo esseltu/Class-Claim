@@ -53,9 +53,26 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+    }, (error) => {
+      console.error("Auth state change error:", error);
+      setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Safety timeout: if firebase doesn't respond in 5s, stop loading
+    const timeout = setTimeout(() => {
+      setLoading((currentLoading) => {
+        if (currentLoading) {
+          console.warn("Auth state change timed out");
+          return false;
+        }
+        return currentLoading;
+      });
+    }, 5000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const value = {
