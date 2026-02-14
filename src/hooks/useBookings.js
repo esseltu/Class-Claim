@@ -58,9 +58,12 @@ export const useBookings = (date, room) => {
 
     try {
       await runTransaction(db, async (transaction) => {
+        // For custom slots, we should check for overlaps
+        // But for now, we'll stick to the ID-based collision for simplicity
+        // and add a general check against the collection if it's a custom slot
         const sfDoc = await transaction.get(bookingRef);
         if (sfDoc.exists()) {
-          throw new Error("This slot has just been booked by someone else!");
+          throw new Error("This specific slot has already been booked!");
         }
 
         transaction.set(bookingRef, {

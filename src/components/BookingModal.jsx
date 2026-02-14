@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoClose } from 'react-icons/io5';
+import { IoClose, IoTimeOutline } from 'react-icons/io5';
 import { useAuth } from '../context/AuthContext';
 
 const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
@@ -8,16 +8,33 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
   const [courseCode, setCourseCode] = useState('');
   const [bookedBy, setBookedBy] = useState('');
   const [notes, setNotes] = useState('');
+  const [isCustomTime, setIsCustomTime] = useState(false);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
   useEffect(() => {
     if (isOpen && user) {
       setBookedBy(user.displayName || '');
+      // Initialize custom times from slot if available
+      if (slot) {
+        const [start, end] = slot.split(' - ');
+        setStartTime(start || '');
+        setEndTime(end || '');
+      }
+      setIsCustomTime(false);
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, slot]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onConfirm({ courseCode, bookedBy, notes });
+    const finalSlot = isCustomTime ? `${startTime} - ${endTime}` : slot;
+    onConfirm({ 
+      courseCode, 
+      bookedBy, 
+      notes,
+      slot: finalSlot, // Pass the potentially custom slot
+      isCustom: isCustomTime
+    });
     setCourseCode('');
     setBookedBy('');
     setNotes('');
@@ -32,7 +49,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-white/20 dark:border-gray-700"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-white/20 dark:border-gray-700 max-h-[90vh] overflow-y-auto"
         >
           <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Book Room</h3>
@@ -42,13 +59,68 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
           </div>
           
           <div className="p-6 bg-gray-50/50 dark:bg-gray-900/50">
-            <div className="mb-6 text-sm text-gray-600 dark:text-gray-300">
-              <p><strong>Room:</strong> {room}</p>
-              <p><strong>Date:</strong> {date}</p>
-              <p><strong>Time:</strong> {slot}</p>
+            <div className="mb-6 text-sm text-gray-600 dark:text-gray-300 grid grid-cols-2 gap-2">
+              <div><strong>Room:</strong> {room}</div>
+              <div><strong>Date:</strong> {date}</div>
+              <div className="col-span-2">
+                <strong>Default Slot:</strong> {slot}
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Custom Time Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <IoTimeOutline className="text-red-500" />
+                  Custom Time Slot
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCustomTime(!isCustomTime)}
+                  className={`
+                    w-10 h-5 rounded-full relative transition-colors duration-200
+                    ${isCustomTime ? 'bg-red-600' : 'bg-gray-200'}
+                  `}
+                >
+                  <div className={`
+                    absolute top-1 left-1 w-3 h-3 rounded-full bg-white transition-transform duration-200
+                    ${isCustomTime ? 'translate-x-5' : 'translate-x-0'}
+                  `} />
+                </button>
+              </div>
+
+              {isCustomTime && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="grid grid-cols-2 gap-4 pt-2"
+                >
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Start Time</label>
+                    <input
+                      type="time"
+                      required={isCustomTime}
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-red-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">End Time</label>
+                    <input
+                      type="time"
+                      required={isCustomTime}
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-red-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <p className="col-span-2 text-[10px] text-gray-400 italic">
+                    Note: Ensure your custom time doesn't overlap with existing bookings.
+                  </p>
+                </motion.div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Course Code</label>
                 <input
@@ -79,7 +151,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any additional info..."
-                  className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none h-24"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none h-20"
                 />
               </div>
 
