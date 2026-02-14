@@ -137,6 +137,7 @@ function App() {
           <div className="max-w-5xl mx-auto">
             <TimeSlotGrid 
               room={selectedRoom}
+              date={selectedDate}
               bookings={bookings}
               onBook={handleBookSlot}
               onCancel={handleCancelBooking}

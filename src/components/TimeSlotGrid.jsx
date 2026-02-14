@@ -1,11 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { format, isBefore, parse, startOfToday } from 'date-fns';
 import { TIME_SLOTS } from '../data/mockData';
 import { IoTimeOutline, IoPersonOutline, IoBookOutline } from 'react-icons/io5';
 
-const TimeSlotGrid = ({ room, bookings, onBook, onCancel, currentUser }) => {
+const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) => {
   const getBookingForSlot = (slot) => {
     return bookings.find(b => b.slot === slot);
+  };
+
+  const isSlotExpired = (slot) => {
+    try {
+      // slot format: "07:00 - 09:00"
+      const endTimeStr = slot.split(' - ')[1];
+      const slotEndTime = parse(`${date} ${endTimeStr}`, 'yyyy-MM-dd HH:mm', new Date());
+      return isBefore(slotEndTime, new Date());
+    } catch (e) {
+      return false;
+    }
   };
 
   return (
@@ -13,7 +25,11 @@ const TimeSlotGrid = ({ room, bookings, onBook, onCancel, currentUser }) => {
       {TIME_SLOTS.map((slot, index) => {
         const booking = getBookingForSlot(slot);
         const isBooked = !!booking;
+        const expired = isSlotExpired(slot);
         const canCancel = isBooked && currentUser && booking.userId === currentUser.uid;
+
+        // Don't show the slot if it's expired
+        if (expired) return null;
 
         return (
           <motion.div
