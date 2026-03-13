@@ -4,6 +4,10 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { registerSW } from 'virtual:pwa-register'
+
+// Ensure installed PWAs update immediately across devices
+registerSW({ immediate: true })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

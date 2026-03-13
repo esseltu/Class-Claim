@@ -29,11 +29,9 @@ export const AuthProvider = ({ children }) => {
 
       // In standalone PWA on mobile, redirect often fails due to sandboxing/context loss.
       // Use popup for standalone PWA to ensure session is captured.
-      if (isMobile && !isStandalone) {
-        await signInWithRedirect(auth, googleProvider);
-      } else {
-        await signInWithPopup(auth, googleProvider);
-      }
+      // UPDATE: Always use popup for stability across devices unless specifically requested otherwise.
+      // Many mobile browsers (esp. iOS Safari PWA) handle popups better than redirects for preserving state.
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Login failed:", error);
       throw error;

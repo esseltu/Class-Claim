@@ -8,9 +8,10 @@ import {
   deleteDoc, 
   doc,
   serverTimestamp,
-  runTransaction
+  runTransaction,
+  getDocs
 } from 'firebase/firestore';
-import { format } from 'date-fns';
+import { format, parse, isBefore, isAfter } from 'date-fns';
 
 export const useBookings = (date, room) => {
   const [bookings, setBookings] = useState([]);
@@ -50,17 +51,46 @@ export const useBookings = (date, room) => {
   }, [date, room]);
 
   const addBooking = async (bookingDetails) => {
-    // Create a deterministic ID to prevent duplicates
-    // Format: YYYY-MM-DD_Room_Slot (sanitize slot string)
-    const sanitizedSlot = bookingDetails.slot.replace(/[\/\s:]/g, '_');
-    const bookingId = `${bookingDetails.date}_${bookingDetails.room}_${sanitizedSlot}`;
-    const bookingRef = doc(db, "bookings", bookingId);
-
     try {
+      // 1. Parse the new booking times using a fixed reference date for reliability
+      const refDate = new Date(2000, 0, 1);
+      const [newStartStr, newEndStr] = bookingDetails.slot.split(' - ');
+      const newStart = parse(newStartStr.trim(), 'HH:mm', refDate);
+      const newEnd = parse(newEndStr.trim(), 'HH:mm', refDate);
+
+      // 2. Check for overlaps against CURRENT data from Firestore
+      const q = query(
+        collection(db, "bookings"),
+        where("date", "==", bookingDetails.date),
+        where("room", "==", bookingDetails.room)
+      );
+      
+      const snapshot = await getDocs(q);
+      const existingBookings = snapshot.docs.map(doc => doc.data());
+
+      const overlap = existingBookings.find(b => {
+        try {
+          const [bStartStr, bEndStr] = b.slot.split(' - ');
+          const bStart = parse(bStartStr.trim(), 'HH:mm', refDate);
+          const bEnd = parse(bEndStr.trim(), 'HH:mm', refDate);
+
+          // Overlap logic: (StartA < EndB) and (EndA > StartB)
+          return (newStart < bEnd) && (newEnd > bStart);
+        } catch (e) {
+          return false;
+        }
+      });
+
+      if (overlap) {
+        throw new Error(`This time overlaps with an existing booking: ${overlap.slot} (${overlap.courseCode})`);
+      }
+
+      // 3. If no overlap, proceed with deterministic ID booking
+      const sanitizedSlot = bookingDetails.slot.replace(/[\/\s:]/g, '_');
+      const bookingId = `${bookingDetails.date}_${bookingDetails.room}_${sanitizedSlot}`;
+      const bookingRef = doc(db, "bookings", bookingId);
+
       await runTransaction(db, async (transaction) => {
-        // For custom slots, we should check for overlaps
-        // But for now, we'll stick to the ID-based collision for simplicity
-        // and add a general check against the collection if it's a custom slot
         const sfDoc = await transaction.get(bookingRef);
         if (sfDoc.exists()) {
           throw new Error("This specific slot has already been booked!");

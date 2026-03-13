@@ -6,16 +6,41 @@ import { IoTimeOutline, IoPersonOutline, IoBookOutline } from 'react-icons/io5';
 
 const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) => {
   const getBookingForSlot = (slot) => {
-    return bookings.find(b => b.slot === slot);
+    // Check for exact matches first
+    const exactMatch = bookings.find(b => b.slot === slot);
+    if (exactMatch) return exactMatch;
+
+    // Use a fixed date for all time comparisons to avoid timezone/DST issues
+    const refDate = new Date(2000, 0, 1);
+
+    // Check for overlaps with custom bookings
+    const [slotStart, slotEnd] = slot.split(' - ');
+    const sStart = parse(slotStart, 'HH:mm', refDate);
+    const sEnd = parse(slotEnd, 'HH:mm', refDate);
+
+    return bookings.find(b => {
+      try {
+        const [bStartStr, bEndStr] = b.slot.split(' - ');
+        const bStart = parse(bStartStr.trim(), 'HH:mm', refDate);
+        const bEnd = parse(bEndStr.trim(), 'HH:mm', refDate);
+
+        // Overlap logic: (StartA < EndB) and (EndA > StartB)
+        return (sStart < bEnd) && (sEnd > bStart);
+      } catch {
+        return false;
+      }
+    });
   };
 
   const isSlotExpired = (slot) => {
     try {
-      // slot format: "07:00 - 09:00"
-      const endTimeStr = slot.split(' - ')[1];
+      if (date !== format(new Date(), 'yyyy-MM-dd')) return false;
+
+      const endTimeStr = slot.split(' - ')[1].trim();
+      // Use parse with a clean date string
       const slotEndTime = parse(`${date} ${endTimeStr}`, 'yyyy-MM-dd HH:mm', new Date());
       return isBefore(slotEndTime, new Date());
-    } catch (e) {
+    } catch {
       return false;
     }
   };
@@ -47,9 +72,17 @@ const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) =
             onClick={() => !isBooked && onBook(slot)}
           >
             <div className="flex justify-between items-start mb-3">
-              <div className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
-                <IoTimeOutline className="mr-1" />
-                {slot}
+              <div className="flex flex-col">
+                <div className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <IoTimeOutline className="mr-1" />
+                  {slot}
+                </div>
+                {isBooked && booking.slot !== slot && (
+                  <span className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-1">
+                    <span className="h-1 w-1 rounded-full bg-red-500" />
+                    Custom: {booking.slot}
+                  </span>
+                )}
               </div>
               {!isBooked && (
                 <div className="h-2 w-2 rounded-full bg-gray-200 dark:bg-gray-600" />

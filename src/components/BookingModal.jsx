@@ -27,6 +27,18 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (isCustomTime) {
+      if (!startTime || !endTime) {
+        alert("Please select both start and end times.");
+        return;
+      }
+      if (startTime >= endTime) {
+        alert("End time must be after start time.");
+        return;
+      }
+    }
+
     const finalSlot = isCustomTime ? `${startTime} - ${endTime}` : slot;
     onConfirm({ 
       courseCode, 

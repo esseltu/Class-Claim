@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import { format, parse, isBefore } from 'date-fns';
 import { IoMenu, IoCalendarOutline } from 'react-icons/io5';
 import Sidebar from './components/Sidebar';
 import TimeSlotGrid from './components/TimeSlotGrid';
 import BookingModal from './components/BookingModal';
-import { ROOMS } from './data/mockData';
+import { ROOMS, TIME_SLOTS } from './data/mockData';
 import { useBookings } from './hooks/useBookings';
 import { useAuth } from './context/AuthContext';
 
@@ -20,7 +20,45 @@ function App() {
   // Use custom hook for data
   const { bookings, loading, addBooking, cancelBooking } = useBookings(selectedDate, selectedRoom);
 
-  const availableSlotsCount = 6 - bookings.length;
+  const availableSlotsCount = (() => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const refDate = new Date(2000, 0, 1);
+
+    return TIME_SLOTS.filter((slot) => {
+      const [slotStart, slotEnd] = slot.split(' - ');
+
+      // 1) For today, drop slots whose end time has already passed
+      if (selectedDate === todayStr) {
+        const endTimeStr = slotEnd.trim();
+        const slotEndTime = parse(
+          `${selectedDate} ${endTimeStr}`,
+          'yyyy-MM-dd HH:mm',
+          new Date()
+        );
+        if (isBefore(slotEndTime, new Date())) return false;
+      }
+
+      // 2) Drop slots that are already taken (exact or overlapping custom)
+      const sStart = parse(slotStart, 'HH:mm', refDate);
+      const sEnd = parse(slotEnd, 'HH:mm', refDate);
+
+      const exactMatch = bookings.find((b) => b.slot === slot);
+      if (exactMatch) return false;
+
+      const overlap = bookings.find((b) => {
+        try {
+          const [bStartStr, bEndStr] = b.slot.split(' - ');
+          const bStart = parse(bStartStr.trim(), 'HH:mm', refDate);
+          const bEnd = parse(bEndStr.trim(), 'HH:mm', refDate);
+          return sStart < bEnd && sEnd > bStart;
+        } catch {
+          return false;
+        }
+      });
+
+      return !overlap;
+    }).length;
+  })();
 
   // Handlers
   const handleBookSlot = async (slot) => {
