@@ -43,6 +43,8 @@ export const ROOMS = {
 
 export const getRoomDisplayName = (room) =>
   room
+    .replace(' (Chem Lab)', '')
+    .replace(' (IT Lab)', '')
     .replace(' (Block E)', '')
     .replace(' (Block F)', '')
     .replace(' (Architecture Floor)', '');
