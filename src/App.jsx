@@ -4,7 +4,7 @@ import { IoMenu, IoCalendarOutline } from 'react-icons/io5';
 import Sidebar from './components/Sidebar';
 import TimeSlotGrid from './components/TimeSlotGrid';
 import BookingModal from './components/BookingModal';
-import { ROOMS, TIME_SLOTS } from './data/mockData';
+import { ROOMS, TIME_SLOTS, getRoomDisplayName } from './data/mockData';
 import { useBookings } from './hooks/useBookings';
 import { useAuth } from './context/AuthContext';
 
@@ -142,7 +142,7 @@ function App() {
             <div className="flex flex-col">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <span className="hidden sm:inline text-gray-400 dark:text-gray-500 font-normal">Room</span>
-                {selectedRoom}
+                {getRoomDisplayName(selectedRoom)}
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1">
                 <span className={`w-2 h-2 rounded-full ${availableSlotsCount > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
@@ -189,7 +189,7 @@ function App() {
       <BookingModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        room={selectedRoom}
+        room={getRoomDisplayName(selectedRoom)}
         date={selectedDate}
         slot={selectedSlot}
         onConfirm={handleConfirmBooking}

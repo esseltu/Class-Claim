@@ -1,18 +1,51 @@
 import { format } from 'date-fns';
 
 export const ROOMS = {
+  'Block B': [
+    'LT-B01',
+    'LT-B03'
+  ],
+  'Block C': [
+    'LT-C01',
+    'LT-C02'
+  ],
   'Block E': [
-    'E101', 'E102', 'E103', 'E104',
-    'E201', 'E202', 'E203', 'E204',
-    'E301', 'E302', 'E303', 'E304'
+    '101A (Chem Lab)',
+    '103A (Block E)',
+    '201A',
+    '202A',
+    '203A',
+    '204A',
+    '301A (Block E)',
+    '302A',
+    '303A',
+    '304A'
   ],
   'Block F': [
-    'F102', 'F103', 'F104',
-    'F201', 'F202',
-    'F301', 'F302', 'F303', 'F304',
-    'F403', 'F404'
+    '101',
+    '102A',
+    '102B',
+    '103A (Block F)',
+    '103B',
+    '104A',
+    '104B',
+    '201',
+    '202',
+    '301A (Block F)',
+    '301B',
+    '302',
+    '303',
+    '304',
+    '401',
+    '402 (IT Lab)'
   ]
 };
+
+export const getRoomDisplayName = (room) =>
+  room
+    .replace(' (Block E)', '')
+    .replace(' (Block F)', '')
+    .replace(' (Architecture Floor)', '');
 
 export const TIME_SLOTS = [
   '07:00 - 09:00',
@@ -28,7 +61,7 @@ const today = format(new Date(), 'yyyy-MM-dd');
 export const INITIAL_BOOKINGS = [
   {
     id: '1',
-    room: 'E101',
+    room: '101A (Chem Lab)',
     date: today,
     slot: '07:00 - 09:00',
     courseCode: 'PSYC 201',
@@ -37,7 +70,7 @@ export const INITIAL_BOOKINGS = [
   },
   {
     id: '2',
-    room: 'F102',
+    room: '104A',
     date: today,
     slot: '09:00 - 11:00',
     courseCode: 'COMM 101',

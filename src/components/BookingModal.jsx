@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoClose, IoTimeOutline } from 'react-icons/io5';
 import { useAuth } from '../context/AuthContext';
+import { getRoomDisplayName } from '../data/mockData';
 
 const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
   const { user } = useAuth();
@@ -72,7 +73,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
           
           <div className="p-6 bg-gray-50/50 dark:bg-gray-900/50">
             <div className="mb-6 text-sm text-gray-600 dark:text-gray-300 grid grid-cols-2 gap-2">
-              <div><strong>Room:</strong> {room}</div>
+              <div><strong>Room:</strong> {getRoomDisplayName(room)}</div>
               <div><strong>Date:</strong> {date}</div>
               <div className="col-span-2">
                 <strong>Default Slot:</strong> {slot}

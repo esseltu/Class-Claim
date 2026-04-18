@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ROOMS } from '../data/mockData';
+import { ROOMS, getRoomDisplayName } from '../data/mockData';
 import { IoChevronForward, IoLogOutOutline, IoLogoGoogle, IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -69,7 +69,7 @@ const Sidebar = ({ selectedRoom, onSelectRoom, className = '' }) => {
               }
             `}
           >
-            {room}
+            {getRoomDisplayName(room)}
             {selectedRoom === room && <IoChevronForward />}
           </button>
         ))}
