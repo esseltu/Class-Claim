@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { IoClose, IoTimeOutline } from 'react-icons/io5';
 import { useAuth } from '../context/AuthContext';
 import { getRoomDisplayName } from '../data/mockData';
@@ -58,7 +58,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -103,7 +103,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
               </div>
 
               {isCustomTime && (
-                <motion.div 
+                <Motion.div 
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   className="grid grid-cols-2 gap-4 pt-2"
@@ -131,7 +131,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
                   <p className="col-span-2 text-[10px] text-gray-400 italic">
                     Note: Ensure your custom time doesn't overlap with existing bookings.
                   </p>
-                </motion.div>
+                </Motion.div>
               )}
 
               <div>
@@ -185,7 +185,7 @@ const BookingModal = ({ isOpen, onClose, onConfirm, slot, room, date }) => {
               </div>
             </form>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
     </AnimatePresence>
   );

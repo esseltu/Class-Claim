@@ -1,6 +1,14 @@
 import { format } from 'date-fns';
 
 export const ROOMS = {
+  'Basement': [
+    'BSLT 01',
+    'BSLT 02',
+    'BSLT 03',
+    'BSLT 04',
+    'BSLT 05',
+    'BSLT 06'
+  ],
   'Block B': [
     'LT-B01',
     'LT-B03'

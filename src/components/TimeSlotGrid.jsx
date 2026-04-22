@@ -1,10 +1,10 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { format, isBefore, parse, startOfToday } from 'date-fns';
+import { motion as Motion } from 'framer-motion';
+import { format, isBefore, parse } from 'date-fns';
 import { TIME_SLOTS } from '../data/mockData';
 import { IoTimeOutline, IoPersonOutline, IoBookOutline } from 'react-icons/io5';
 
-const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) => {
+const TimeSlotGrid = ({ room: _room, date, bookings, onBook, onCancel, currentUser }) => {
   const getBookingForSlot = (slot) => {
     // Check for exact matches first
     const exactMatch = bookings.find(b => b.slot === slot);
@@ -57,7 +57,7 @@ const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) =
         if (expired) return null;
 
         return (
-          <motion.div
+          <Motion.div
             key={slot}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ const TimeSlotGrid = ({ room, date, bookings, onBook, onCancel, currentUser }) =
                 </span>
               </div>
             )}
-          </motion.div>
+          </Motion.div>
         );
       })}
     </div>

@@ -11,7 +11,7 @@ import {
   runTransaction,
   getDocs
 } from 'firebase/firestore';
-import { format, parse, isBefore, isAfter } from 'date-fns';
+import { parse } from 'date-fns';
 
 export const useBookings = (date, room) => {
   const [bookings, setBookings] = useState([]);
@@ -76,7 +76,7 @@ export const useBookings = (date, room) => {
 
           // Overlap logic: (StartA < EndB) and (EndA > StartB)
           return (newStart < bEnd) && (newEnd > bStart);
-        } catch (e) {
+        } catch {
           return false;
         }
       });
@@ -86,7 +86,7 @@ export const useBookings = (date, room) => {
       }
 
       // 3. If no overlap, proceed with deterministic ID booking
-      const sanitizedSlot = bookingDetails.slot.replace(/[\/\s:]/g, '_');
+      const sanitizedSlot = bookingDetails.slot.replace(/[/\s:]/g, '_');
       const bookingId = `${bookingDetails.date}_${bookingDetails.room}_${sanitizedSlot}`;
       const bookingRef = doc(db, "bookings", bookingId);
 

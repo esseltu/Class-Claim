@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   signInWithPopup, 
-  signInWithRedirect,
   getRedirectResult,
   signOut, 
   onAuthStateChanged,
@@ -23,14 +22,6 @@ export const AuthProvider = ({ children }) => {
       // Ensure persistence is set to local
       await setPersistence(auth, browserLocalPersistence);
 
-      // Check if running in standalone mode (PWA)
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      // In standalone PWA on mobile, redirect often fails due to sandboxing/context loss.
-      // Use popup for standalone PWA to ensure session is captured.
-      // UPDATE: Always use popup for stability across devices unless specifically requested otherwise.
-      // Many mobile browsers (esp. iOS Safari PWA) handle popups better than redirects for preserving state.
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Login failed:", error);

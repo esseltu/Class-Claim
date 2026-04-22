@@ -84,8 +84,8 @@ function App() {
         ...details
       });
       setIsModalOpen(false);
-    } catch (err) {
-      alert(err.message);
+    } catch (e) {
+      alert(e.message);
     }
   };
 
@@ -97,7 +97,7 @@ function App() {
     if (confirm('Are you sure you want to cancel this booking?')) {
       try {
         await cancelBooking(bookingId);
-      } catch (err) {
+      } catch {
         alert('Failed to cancel booking');
       }
     }
